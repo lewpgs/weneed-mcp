@@ -1,6 +1,6 @@
 {
   "name": "weneed-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server for WeNeed (Coop Switzerland) shopping lists",
   "main": "dist/index.js",
   "bin": {
@@ -25,7 +25,14 @@
     "url": "https://github.com/lewpgs/weneed-mcp/issues"
   },
   "author": "lewpgs",
-  "keywords": ["mcp", "weneed", "coop", "shopping-list", "firebase", "model-context-protocol"],
+  "keywords": [
+    "mcp",
+    "weneed",
+    "coop",
+    "shopping-list",
+    "firebase",
+    "model-context-protocol"
+  ],
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
