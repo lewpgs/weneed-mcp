@@ -1,54 +1,59 @@
 # weneed-mcp
 
-MCP server for [WeNeed](https://app.weneed.ch) - the Coop Switzerland shopping list app.
-
-Manage your shopping lists, add/remove items, and search the Coop product catalog through any MCP-compatible client (Claude Code, Claude Desktop, Cursor, etc.).
+Manage your [WeNeed](https://app.weneed.ch) (Coop Switzerland) shopping lists with Claude. Add items, check them off, search the Coop catalog, and more.
 
 > **Important**
 > This is **not an official MCP server** and is **not affiliated with Coop or WeNeed** in any way.
-> It uses a reverse-engineered Firebase backend and may **stop working at any time** if Coop changes their infrastructure, security rules, or Cloud Functions.
+> It uses a reverse-engineered Firebase backend and may **stop working at any time** if Coop changes their infrastructure.
 > **Use at your own risk.**
 
-## Prerequisites
+## What you can do
 
-- Node.js 18+
-- A [WeNeed](https://app.weneed.ch) account (email/password login)
+Once installed, just talk to Claude naturally:
 
-## Quick Start
+- "What's on my shopping list?"
+- "Add milk and eggs to my list"
+- "Check off the bananas"
+- "Search the catalog for gluten-free pasta"
+- "Remove the yogurt from my list"
 
-```bash
-npx weneed-mcp
-```
+> **Note:** If you use shared lists, actions taken through this server will be visible to all participants.
 
-Or install globally:
+## Install
 
-```bash
-npm install -g weneed-mcp
-```
+You need a [WeNeed](https://app.weneed.ch) account (email/password) to use this.
 
-## Configuration
+### Claude Desktop (recommended)
 
-### Claude Desktop (Extension)
+1. Download [weneed-mcp.mcpb](https://github.com/lewpgs/weneed-mcp/releases/latest/download/weneed-mcp.mcpb)
+2. Install it:
 
-The easiest way to get started. Download [weneed-mcp.mcpb](https://github.com/lewpgs/weneed-mcp/releases/latest/download/weneed-mcp.mcpb) and install it:
+   **macOS** - Double-click the file, or drag and drop it onto the Claude Desktop app icon
 
-**macOS:**
-- **Double-click** the downloaded file, or
-- **Drag and drop** it onto the Claude Desktop app icon
+   **Windows** - In Claude Desktop, go to File > Settings > Extensions > Advanced Settings > Install Extension and select the file
 
-**Windows:**
-- In Claude Desktop, go to **File > Settings > Extensions > Advanced Settings > Install Extension** and select the downloaded file
+3. Enter your WeNeed email and password when prompted. Your credentials are stored securely in your OS keychain.
 
-You'll be prompted for your WeNeed credentials, which are stored securely in your OS keychain.
+That's it. You're ready to go.
 
-### Claude Code
+---
+
+## Advanced setup
+
+These methods require [Node.js 18+](https://nodejs.org) installed on your machine.
+
+<details>
+<summary><strong>Claude Code</strong></summary>
 
 ```bash
 claude mcp add weneed -e WENEED_EMAIL=your-email@example.com \
   -e WENEED_PASSWORD=your-password -- npx -y weneed-mcp
 ```
 
-### Claude Desktop
+</details>
+
+<details>
+<summary><strong>Claude Desktop (manual config)</strong></summary>
 
 Add to your `claude_desktop_config.json`:
 
@@ -67,7 +72,10 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-### Cursor
+</details>
+
+<details>
+<summary><strong>Cursor</strong></summary>
 
 Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
 
@@ -86,7 +94,10 @@ Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
 }
 ```
 
-### Test Connection
+</details>
+
+<details>
+<summary><strong>Test connection</strong></summary>
 
 Verify your credentials work before wiring it into a client:
 
@@ -94,7 +105,9 @@ Verify your credentials work before wiring it into a client:
 WENEED_EMAIL='your-email@example.com' WENEED_PASSWORD='your-password' npx weneed-mcp
 ```
 
-## Available Tools
+</details>
+
+## Available tools
 
 | Tool | Description |
 |---|---|
@@ -107,19 +120,7 @@ WENEED_EMAIL='your-email@example.com' WENEED_PASSWORD='your-password' npx weneed
 | `search_catalog` | Search the Coop product catalog |
 | `get_categories` | Get product categories from the Coop catalog |
 
-## Example Usage
-
-Once configured, you can interact naturally:
-
-- "What's on my shopping list?"
-- "Add milk and eggs to my list"
-- "Check off the bananas"
-- "Search the catalog for gluten-free pasta"
-- "Remove the yogurt from my list"
-
-> **Note:** If you use shared lists, this MCP server can modify items visible to all participants. Keep that in mind when adding, checking, or removing items.
-
-## How It Works
+## How it works
 
 WeNeed is a Progressive Web App backed by Firebase (Firestore + Cloud Functions). This MCP server authenticates with your credentials using the Firebase JS SDK, then reads/writes directly to the same Firestore collections and calls the same Cloud Functions that the official app uses.
 
