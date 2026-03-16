@@ -30,7 +30,13 @@ npm install -g weneed-mcp
 
 ### Claude Desktop (Extension)
 
-The easiest way to get started. Download [weneed-mcp.mcpb](https://github.com/lewpgs/weneed-mcp/releases/latest/download/weneed-mcp.mcpb), then double-click the file or drag it into Claude Desktop. You'll be prompted for your WeNeed credentials, which are stored securely in your OS keychain.
+The easiest way to get started. Download [weneed-mcp.mcpb](https://github.com/lewpgs/weneed-mcp/releases/latest/download/weneed-mcp.mcpb), then install it using one of these methods:
+
+- **Double-click** the downloaded file
+- **Drag and drop** onto the Claude Desktop app icon (macOS only)
+- **Manual install** - File > Settings > Extensions > Advanced Settings > Install Extension
+
+You'll be prompted for your WeNeed credentials, which are stored securely in your OS keychain.
 
 ### Claude Code
 
