@@ -42,42 +42,19 @@ That's it. You're ready to go.
 
 These methods require [Node.js 18+](https://nodejs.org) installed on your machine.
 
-<details>
-<summary><strong>Claude Code</strong></summary>
+### Claude Code
 
 ```bash
 claude mcp add weneed -e WENEED_EMAIL=your-email@example.com \
   -e WENEED_PASSWORD=your-password -- npx -y weneed-mcp
 ```
 
-</details>
+### Claude Desktop (manual) / Cursor
 
-<details>
-<summary><strong>Claude Desktop (manual config)</strong></summary>
+Add the following to your config file:
 
-Add to your `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "weneed": {
-      "command": "npx",
-      "args": ["-y", "weneed-mcp"],
-      "env": {
-        "WENEED_EMAIL": "your-email@example.com",
-        "WENEED_PASSWORD": "your-password"
-      }
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary><strong>Cursor</strong></summary>
-
-Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
+- **Claude Desktop** - `claude_desktop_config.json`
+- **Cursor** - `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global)
 
 ```json
 {
@@ -94,18 +71,13 @@ Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
 }
 ```
 
-</details>
-
-<details>
-<summary><strong>Test connection</strong></summary>
+### Test connection
 
 Verify your credentials work before wiring it into a client:
 
 ```bash
 WENEED_EMAIL='your-email@example.com' WENEED_PASSWORD='your-password' npx weneed-mcp
 ```
-
-</details>
 
 ## Available tools
 
