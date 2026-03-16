@@ -4,23 +4,26 @@ MCP server for [WeNeed](https://app.weneed.ch) - the Coop Switzerland shopping l
 
 Manage your shopping lists, add/remove items, and search the Coop product catalog through any MCP-compatible client (Claude Code, Claude Desktop, Cursor, etc.).
 
-> **Disclaimer**: This is an unofficial MCP server. WeNeed/Coop does not provide a public API. This project reverse-engineers the app's Firebase backend and may stop working at any time if they change their infrastructure.
+> **Important**
+> This is **not an official MCP server** and is **not affiliated with Coop or WeNeed** in any way.
+> It uses a reverse-engineered Firebase backend and may **stop working at any time** if Coop changes their infrastructure, security rules, or Cloud Functions.
+> **Use at your own risk.**
 
 ## Prerequisites
 
 - Node.js 18+
 - A [WeNeed](https://app.weneed.ch) account (email/password login)
 
-## Install
-
-```bash
-npm install -g weneed-mcp
-```
-
-Or run directly with `npx`:
+## Quick Start
 
 ```bash
 npx weneed-mcp
+```
+
+Or install globally:
+
+```bash
+npm install -g weneed-mcp
 ```
 
 ## Configuration
@@ -28,24 +31,8 @@ npx weneed-mcp
 ### Claude Code
 
 ```bash
-claude mcp add weneed -- npx -y weneed-mcp
-```
-
-Then set your credentials as environment variables, or add them to the MCP config:
-
-```json
-{
-  "mcpServers": {
-    "weneed": {
-      "command": "npx",
-      "args": ["-y", "weneed-mcp"],
-      "env": {
-        "WENEED_EMAIL": "your-email@example.com",
-        "WENEED_PASSWORD": "your-password"
-      }
-    }
-  }
-}
+claude mcp add weneed -e WENEED_EMAIL=your-email@example.com \
+  -e WENEED_PASSWORD=your-password -- npx -y weneed-mcp
 ```
 
 ### Claude Desktop
@@ -67,14 +54,31 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-### From source
+### Cursor
+
+Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
+
+```json
+{
+  "mcpServers": {
+    "weneed": {
+      "command": "npx",
+      "args": ["-y", "weneed-mcp"],
+      "env": {
+        "WENEED_EMAIL": "your-email@example.com",
+        "WENEED_PASSWORD": "your-password"
+      }
+    }
+  }
+}
+```
+
+### Test Connection
+
+Verify your credentials work before wiring it into a client:
 
 ```bash
-git clone https://github.com/lewpgs/weneed-mcp.git
-cd weneed-mcp
-npm install
-npm run build
-node dist/index.js
+WENEED_EMAIL='your-email@example.com' WENEED_PASSWORD='your-password' npx weneed-mcp
 ```
 
 ## Available Tools
@@ -100,11 +104,38 @@ Once configured, you can interact naturally:
 - "Search the catalog for gluten-free pasta"
 - "Remove the yogurt from my list"
 
+> **Note:** If you use shared lists, this MCP server can modify items visible to all participants. Keep that in mind when adding, checking, or removing items.
+
 ## How It Works
 
 WeNeed is a Progressive Web App backed by Firebase (Firestore + Cloud Functions). This MCP server authenticates with your credentials using the Firebase JS SDK, then reads/writes directly to the same Firestore collections and calls the same Cloud Functions that the official app uses.
 
 Your credentials are only sent to Firebase/Google's authentication servers. They are never stored or transmitted anywhere else.
+
+## Development
+
+```bash
+git clone https://github.com/lewpgs/weneed-mcp.git
+cd weneed-mcp
+npm install
+npm run build
+node dist/index.js
+```
+
+Debug with the MCP Inspector:
+
+```bash
+WENEED_EMAIL='your-email@example.com' WENEED_PASSWORD='your-password' \
+  npx -y @modelcontextprotocol/inspector npx weneed-mcp
+```
+
+## Disclaimers
+
+- **Unofficial** - This project is not affiliated with, endorsed by, or connected to Coop or WeNeed in any way.
+- **Reverse-engineered API** - This server interacts with WeNeed's Firebase backend, which is not a public API. Changes to Coop's Firebase project, Firestore security rules, or Cloud Functions could break this server without notice.
+- **Credentials** - Your email and password are only used to authenticate with Firebase/Google. They are never stored or sent anywhere else.
+- **Shared lists** - If you use shared shopping lists, actions taken through this MCP server (adding, checking, removing items) will be visible to all participants.
+- **Use at your own risk** - No guarantees of functionality, availability, or compatibility.
 
 ## License
 
