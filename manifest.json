@@ -1,0 +1,52 @@
+{
+  "manifest_version": "0.3",
+  "name": "weneed-mcp",
+  "display_name": "WeNeed Shopping Lists",
+  "version": "0.2.0",
+  "description": "Manage your WeNeed (Coop Switzerland) shopping lists through Claude. Add, check off, and remove items, search the Coop product catalog, and more.",
+  "author": {
+    "name": "lewpgs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lewpgs/weneed-mcp"
+  },
+  "license": "MIT",
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"],
+      "env": {
+        "WENEED_EMAIL": "${user_config.email}",
+        "WENEED_PASSWORD": "${user_config.password}"
+      }
+    }
+  },
+  "user_config": {
+    "email": {
+      "type": "string",
+      "title": "WeNeed Email",
+      "description": "The email address you use to log in to WeNeed",
+      "required": true
+    },
+    "password": {
+      "type": "string",
+      "title": "WeNeed Password",
+      "description": "Your WeNeed account password",
+      "sensitive": true,
+      "required": true
+    }
+  },
+  "tools": [
+    { "name": "get_shopping_lists", "description": "Get all shopping lists you have access to" },
+    { "name": "get_list_items", "description": "Get all items in a shopping list" },
+    { "name": "add_item", "description": "Add a product to a shopping list" },
+    { "name": "check_item", "description": "Mark an item as checked/bought" },
+    { "name": "uncheck_item", "description": "Uncheck a previously checked item" },
+    { "name": "remove_item", "description": "Remove an item from a list" },
+    { "name": "search_catalog", "description": "Search the Coop product catalog" },
+    { "name": "get_categories", "description": "Get product categories" }
+  ]
+}
