@@ -67,9 +67,9 @@ server.tool(
   "add_item",
   "Add a product to a shopping list by name. Use search_catalog first to find exact product matches from the Coop catalog.",
   AddItemSchema.shape,
-  async ({ listId, name, description, locale }) => {
+  async ({ listId, name, size, price, locale }) => {
     try {
-      const result = await addItem(listId, name, description ?? "", locale ?? "de");
+      const result = await addItem(listId, name, size, price, locale ?? "de");
       return { content: [{ type: "text", text: result }] };
     } catch (error) {
       return {

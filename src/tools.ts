@@ -50,21 +50,12 @@ function findCatalogMatch(
   name: string
 ): CatalogProduct | null {
   const lower = name.toLowerCase().trim();
-  const inputWords = lower.split(/\s+/).filter((w) => w.length > 0);
-  // Exact match on any language name (case-insensitive)
-  const exact = catalog.find((p) =>
-    Object.values(p.name).some((n) => n.toLowerCase().trim() === lower)
+  // Exact match only (case-insensitive) on any language name
+  return (
+    catalog.find((p) =>
+      Object.values(p.name).some((n) => n.toLowerCase().trim() === lower)
+    ) ?? null
   );
-  if (exact) return exact;
-  // Word-level match: a catalog name word matches an input word exactly
-  const wordMatch = catalog.find((p) =>
-    Object.values(p.name).some((n) => {
-      const catalogWords = n.toLowerCase().trim().split(/\s+/).filter((w) => w.length > 0);
-      if (!catalogWords.length) return false;
-      return inputWords.some((iw) => catalogWords.some((cw) => cw === iw));
-    })
-  );
-  return wordMatch ?? null;
 }
 
 function generateUUID(): string {
@@ -157,7 +148,8 @@ export async function getListItems(listId: string): Promise<string> {
 export async function addItem(
   listId: string,
   name: string,
-  description: string,
+  size: string | undefined,
+  price: string | undefined,
   locale: string
 ): Promise<string> {
   const uid = await ensureAuth();
@@ -167,11 +159,12 @@ export async function addItem(
   const catalog = await getCatalog();
   const catalogMatch = findCatalogMatch(catalog, name);
 
+  const description = [size, price].filter(Boolean).join(" - ");
   const emptyLangs = { de: "", en: "", fr: "", it: "" };
   const productData = {
     productId: catalogMatch?.productId ?? generateUUID(),
     name: { de: name, en: name, fr: name, it: name },
-    description: description || "",
+    description,
     categoryId: catalogMatch ? Number(catalogMatch.categoryId) : 999,
     checked: false,
     status: "active",

@@ -7,7 +7,8 @@ export const GetListItemsSchema = z.object({
 export const AddItemSchema = z.object({
   listId: z.string().describe("The shopping list document ID to add the item to"),
   name: z.string().describe("Name of the product to add"),
-  description: z.string().optional().default("").describe("Optional description or note for the item"),
+  size: z.string().optional().describe("Package size (e.g. 500g, 1L, 6-pack)"),
+  price: z.string().optional().describe("Price (e.g. CHF 7.50)"),
   locale: z.string().optional().default("de").describe("Locale for the product name (de, en, fr, it)"),
 });
 
