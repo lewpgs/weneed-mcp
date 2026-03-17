@@ -154,9 +154,17 @@ export async function callFunction<TReq, TRes>(
   data?: TReq
 ): Promise<TRes> {
   await ensureAuth();
-  const fn = httpsCallable<TReq, TRes>(getFunctionsInstance(), name);
-  const result = await fn(data as TReq);
-  return result.data;
+  // Try primary region, fall back to europe-west3
+  try {
+    const fn = httpsCallable<TReq, TRes>(getFunctionsInstance(), name);
+    const result = await fn(data as TReq);
+    return result.data;
+  } catch {
+    const fallback = getFunctions(getApp(), "europe-west3");
+    const fn = httpsCallable<TReq, TRes>(fallback, name);
+    const result = await fn(data as TReq);
+    return result.data;
+  }
 }
 
 // Re-export Firestore utilities for use in tools

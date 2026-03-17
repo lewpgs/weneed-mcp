@@ -18,6 +18,7 @@ import {
 import type {
   ShoppingListData,
   ShoppingListProductData,
+  CatalogProduct,
   CatalogSearchResponse,
   CatalogCategoriesResponse,
 } from "./types.js";
@@ -25,6 +26,46 @@ import type {
 // Collections
 const LISTS = "v2_shoppingLists";
 const PRODUCTS = "v2_shoppingListProducts";
+
+// Cached catalog for matching items to icons/categories
+let catalogCache: CatalogProduct[] | null = null;
+
+async function getCatalog(): Promise<CatalogProduct[]> {
+  if (catalogCache) return catalogCache;
+  try {
+    const result = await callFunction<unknown, Record<string, unknown>>(
+      "catalogProducts_v2",
+      { locale: "en" }
+    );
+    const list = (result as any).productList ?? (result as any).products ?? [];
+    catalogCache = list as CatalogProduct[];
+    return catalogCache;
+  } catch {
+    return [];
+  }
+}
+
+function findCatalogMatch(
+  catalog: CatalogProduct[],
+  name: string
+): CatalogProduct | null {
+  const lower = name.toLowerCase().trim();
+  const inputWords = lower.split(/\s+/).filter((w) => w.length > 0);
+  // Exact match on any language name (case-insensitive)
+  const exact = catalog.find((p) =>
+    Object.values(p.name).some((n) => n.toLowerCase().trim() === lower)
+  );
+  if (exact) return exact;
+  // Word-level match: a catalog name word matches an input word exactly
+  const wordMatch = catalog.find((p) =>
+    Object.values(p.name).some((n) => {
+      const catalogWords = n.toLowerCase().trim().split(/\s+/).filter((w) => w.length > 0);
+      if (!catalogWords.length) return false;
+      return inputWords.some((iw) => catalogWords.some((cw) => cw === iw));
+    })
+  );
+  return wordMatch ?? null;
+}
 
 function generateUUID(): string {
   const hex = "0123456789ABCDEF";
@@ -122,12 +163,16 @@ export async function addItem(
   const uid = await ensureAuth();
   const db = getDb();
 
+  // Try to find a matching catalog product for icon and category
+  const catalog = await getCatalog();
+  const catalogMatch = findCatalogMatch(catalog, name);
+
   const emptyLangs = { de: "", en: "", fr: "", it: "" };
   const productData = {
-    productId: generateUUID(),
+    productId: catalogMatch?.productId ?? generateUUID(),
     name: { de: name, en: name, fr: name, it: name },
     description: description || "",
-    categoryId: 999,
+    categoryId: catalogMatch ? Number(catalogMatch.categoryId) : 999,
     checked: false,
     status: "active",
     shoppingListId: listId,
@@ -135,12 +180,12 @@ export async function addItem(
     lastCheckedAt: null,
     coopProduct: null,
     source: "user",
-    synonyms: emptyLangs,
-    keywords: { ...emptyLangs },
-    brands: "",
-    popularityIndex: 999,
-    imageName: "",
-    type: "OTHER",
+    synonyms: catalogMatch?.synonyms ?? emptyLangs,
+    keywords: catalogMatch?.keywords ?? { ...emptyLangs },
+    brands: catalogMatch?.brands ?? "",
+    popularityIndex: catalogMatch?.popularityIndex ?? 999,
+    imageName: catalogMatch?.imageName ?? "",
+    type: catalogMatch?.type ?? "OTHER",
   };
 
   const docId = generateUUID();
@@ -223,12 +268,13 @@ export async function searchCatalog(
   searchQuery: string,
   locale: string
 ): Promise<string> {
-  const result = await callFunction<unknown, CatalogSearchResponse>(
-    "catalogProducts_v2",
-    { query: searchQuery, locale }
+  const catalog = await getCatalog();
+  const lower = searchQuery.toLowerCase();
+  const matches = catalog.filter((p) =>
+    Object.values(p.name).some((n) => n.toLowerCase().includes(lower))
   );
 
-  const products = (result.products ?? []).map((p) => ({
+  const products = matches.slice(0, 20).map((p) => ({
     productId: p.productId,
     name: p.name,
     categoryId: p.categoryId,
