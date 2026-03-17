@@ -13,6 +13,7 @@ import {
   query,
   where,
   serverTimestamp,
+  increment,
 } from "./firebase.js";
 import type {
   ShoppingListData,
@@ -25,13 +26,16 @@ import type {
 const LISTS = "v2_shoppingLists";
 const PRODUCTS = "v2_shoppingListProducts";
 
-function generateId(): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < 20; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
+function generateUUID(): string {
+  const hex = "0123456789ABCDEF";
+  const sections = [8, 4, 4, 4, 12];
+  return sections
+    .map((len) =>
+      Array.from({ length: len }, () =>
+        hex.charAt(Math.floor(Math.random() * 16))
+      ).join("")
+    )
+    .join("-");
 }
 
 export async function getShoppingLists(): Promise<string> {
@@ -118,36 +122,37 @@ export async function addItem(
   const uid = await ensureAuth();
   const db = getDb();
 
-  const nameObj: Record<string, string> = { de: "", en: "", fr: "", it: "" };
-  nameObj[locale] = name;
-
-  const productData: Omit<ShoppingListProductData, "lastCheckedAt"> = {
-    productId: generateId(),
-    name: nameObj,
+  const emptyLangs = { de: "", en: "", fr: "", it: "" };
+  const productData = {
+    productId: generateUUID(),
+    name: { de: name, en: name, fr: name, it: name },
     description: description || "",
-    categoryId: null,
+    categoryId: 999,
     checked: false,
     status: "active",
     shoppingListId: listId,
     attachmentImage: null,
-    source: "weneed-mcp",
-    synonyms: null,
-    keywords: null,
-    brands: null,
-    popularityIndex: null,
-    imageName: null,
+    lastCheckedAt: null,
+    coopProduct: null,
+    source: "user",
+    synonyms: emptyLangs,
+    keywords: { ...emptyLangs },
+    brands: "",
+    popularityIndex: 999,
+    imageName: "",
     type: "OTHER",
   };
 
-  const docId = generateId();
+  const docId = generateUUID();
   const wrapped = wrapForCreate(productData as unknown as Record<string, unknown>, uid);
 
   await setDoc(doc(db, LISTS, listId, PRODUCTS, docId), wrapped);
 
-  // Update the list's productLastModified fields
+  // Update the list's productLastModified fields and unchecked count
   await updateDoc(doc(db, LISTS, listId), {
     "data.productLastModifiedAt": serverTimestamp(),
     "data.productLastModifiedBy": uid,
+    "data.numberOfUncheckedProducts": increment(1),
   });
 
   return JSON.stringify(

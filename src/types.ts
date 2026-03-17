@@ -26,7 +26,7 @@ export interface ShoppingListProductData {
   productId: string;
   name: Record<string, string>; // { de: "...", en: "...", fr: "...", it: "..." }
   description: string;
-  categoryId: string | null;
+  categoryId: string | number | null;
   checked: boolean;
   status: "active" | "inactive";
   shoppingListId: string;

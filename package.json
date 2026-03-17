@@ -1,6 +1,6 @@
 {
   "name": "weneed-mcp",
-  "version": "0.2.4",
+  "version": "0.2.9",
   "description": "MCP server for WeNeed (Coop Switzerland) shopping lists",
   "main": "dist/index.js",
   "bin": {

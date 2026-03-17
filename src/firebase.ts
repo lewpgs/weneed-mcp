@@ -20,6 +20,7 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
   serverTimestamp,
+  increment,
   type FieldValue,
 } from "firebase/firestore";
 import {
@@ -105,27 +106,34 @@ export function unwrapDoc<T>(
   };
 }
 
-function getSource(): string {
-  return "weneed-mcp";
+function getSourceMeta() {
+  return {
+    appVersion: "2.6.1",
+    platform: "web",
+    meta: "",
+    originator: "weneed",
+  };
 }
 
 export function wrapForCreate<T extends Record<string, unknown>>(
   data: T,
   userId: string
-): FirestoreWrapper<T> {
+): Record<string, unknown> {
   const now = serverTimestamp();
+  const source = getSourceMeta();
   return {
     data,
     origin: {
-      createdAt: now as unknown as FieldValue,
+      createdAt: now,
       createdBy: userId,
-      source: getSource(),
+      source,
     },
     activity: {
-      lastModifiedAt: now as unknown as FieldValue,
+      lastModifiedAt: now,
       lastModifiedBy: userId,
+      source,
     },
-  } as unknown as FirestoreWrapper<T>;
+  };
 }
 
 export function wrapFieldsForUpdate(
@@ -163,4 +171,5 @@ export {
   query,
   where,
   serverTimestamp,
+  increment,
 };
