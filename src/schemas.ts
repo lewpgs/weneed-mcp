@@ -9,6 +9,9 @@ export const AddItemSchema = z.object({
   name: z.string().describe("Name of the product to add"),
   size: z.string().optional().describe("Package size (e.g. 500g, 1L, 6-pack)"),
   price: z.string().optional().describe("Price (e.g. CHF 7.50)"),
+  category: z.number().optional().describe(
+    "Category ID: 1=Fruit & vegetables, 2=Bread & baked goods, 3=Dairy products & eggs, 4=Meat & fish, 5=Store cupboard/pantry, 6=Sweets & snacks, 7=Beverages, 8=Frozen food & ready meals, 9=Health & bodycare, 10=Household, 11=Tobacco goods, 12=Clothes & shoes, 13=Garden & DIY, 14=Pet supplies. Omit for uncategorized."
+  ),
   locale: z.string().optional().default("de").describe("Locale for the product name (de, en, fr, it)"),
 });
 

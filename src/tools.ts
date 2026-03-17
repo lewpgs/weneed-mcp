@@ -150,6 +150,7 @@ export async function addItem(
   name: string,
   size: string | undefined,
   price: string | undefined,
+  category: number | undefined,
   locale: string
 ): Promise<string> {
   const uid = await ensureAuth();
@@ -165,7 +166,7 @@ export async function addItem(
     productId: catalogMatch?.productId ?? generateUUID(),
     name: { de: name, en: name, fr: name, it: name },
     description,
-    categoryId: catalogMatch ? Number(catalogMatch.categoryId) : 999,
+    categoryId: category ?? (catalogMatch ? Number(catalogMatch.categoryId) : 999),
     checked: false,
     status: "active",
     shoppingListId: listId,
@@ -284,10 +285,10 @@ export async function getCategories(locale: string): Promise<string> {
     { locale }
   );
 
-  const categories = (result.categoryList ?? []).map((c) => ({
-    id: c.id,
+  const categories = (result.categoryList ?? []).map((c: any) => ({
+    id: c.categoryId ?? c.id,
     name: c.name,
-    parentId: c.parentId,
+    imageName: c.imageName,
   }));
 
   return JSON.stringify(categories, null, 2);
